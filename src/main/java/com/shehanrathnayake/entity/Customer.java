@@ -13,7 +13,7 @@ import javax.persistence.Table;
 @Entity @Table(name = "customer")
 public class Customer implements SuperEntity{
     @Id
-    @Column(length = 10)
+    @Column(name = "customer_id", length = 10)
     private String customerId;
     @Column(nullable = false, length = 60)
     private String name;
