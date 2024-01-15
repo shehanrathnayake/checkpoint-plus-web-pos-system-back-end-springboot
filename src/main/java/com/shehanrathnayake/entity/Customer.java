@@ -21,10 +21,4 @@ public class Customer implements SuperEntity{
     private String phone;
     @Column(nullable = false, length = 500)
     private String address;
-
-    public Customer(String name, String phone, String address) {
-        this.name = name;
-        this.phone = phone;
-        this.address = address;
-    }
 }

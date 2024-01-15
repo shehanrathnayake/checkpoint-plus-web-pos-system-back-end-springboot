@@ -22,6 +22,12 @@ public class CustomerTO implements Serializable {
     @Pattern(regexp = "^[+]?\\d+$", message = "Wrong number format")
     String phone;
     @NotBlank(message = "Address cannot be blank")
-    @Pattern(regexp = "^[A-Za-z ]+$", message = "Wrong address format")
+    @Pattern(regexp = "^[A-Za-z0-9 ]+$", message = "Wrong address format")
     String address;
+
+    public CustomerTO(String name, String phone, String address) {
+        this.name = name;
+        this.phone = phone;
+        this.address = address;
+    }
 }

@@ -26,6 +26,13 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerTO saveCustomer(CustomerTO customerTO) {
+
+        Optional<Customer> optLastCustomer = repository.findLastCustomer();
+        String newCustomerId;
+        if (optLastCustomer.isEmpty()) newCustomerId = "C000001";
+        else newCustomerId = String.format("C%06d", Integer.parseInt(optLastCustomer.get().getCustomerId().substring(1)) + 1);
+        customerTO.setCustomerId(newCustomerId);
+
         Customer customer = transformer.fromCustomerTO(customerTO);
         Customer savedCustomer = repository.save(customer);
         return transformer.toCustomerTO(savedCustomer);
