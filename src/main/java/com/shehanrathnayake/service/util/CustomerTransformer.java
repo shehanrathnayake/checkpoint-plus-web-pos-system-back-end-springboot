@@ -1,5 +1,6 @@
 package com.shehanrathnayake.service.util;
 
+import com.shehanrathnayake.converter.IdConverter;
 import com.shehanrathnayake.entity.Customer;
 import com.shehanrathnayake.to.CustomerTO;
 import org.modelmapper.ModelMapper;
@@ -12,8 +13,13 @@ import java.util.stream.Collectors;
 public class CustomerTransformer {
     private final ModelMapper mapper;
 
-    public CustomerTransformer(ModelMapper mapper) {
+    public CustomerTransformer(ModelMapper mapper, IdConverter idConverter) {
         this.mapper = mapper;
+        mapper.typeMap(String.class, Integer.class)
+                .setConverter(ctx -> (ctx.getSource() != null) ? idConverter.convertCustomerIdToInt(ctx.getSource()) : null);
+
+        mapper.typeMap(Integer.class, String.class)
+                .setConverter(ctx -> idConverter.convertIntToUserId(ctx.getSource()));
     }
 
     public Customer fromCustomerTO(CustomerTO customerTO) {

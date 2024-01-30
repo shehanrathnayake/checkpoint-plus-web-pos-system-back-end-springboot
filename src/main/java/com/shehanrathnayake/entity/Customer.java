@@ -8,13 +8,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Data @AllArgsConstructor @NoArgsConstructor
 @Entity @Table(name = "customer")
-public class Customer implements SuperEntity{
+public class Customer implements SuperEntity {
     @Id
-    @Column(name = "customer_id", length = 10)
-    private String customerId;
+    private int id;
     @Column(nullable = false, length = 60)
     private String name;
     @Column(nullable = false, length = 20)

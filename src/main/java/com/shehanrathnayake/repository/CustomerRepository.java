@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-public interface CustomerRepository extends JpaRepository<Customer, String> {
+public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
     @Query(value = "SELECT * FROM customer ORDER BY customer_id DESC LIMIT 1", nativeQuery = true)
     Optional<Customer> findLastCustomer();

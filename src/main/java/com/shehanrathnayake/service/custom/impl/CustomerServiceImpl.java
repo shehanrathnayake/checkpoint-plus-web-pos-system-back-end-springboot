@@ -1,5 +1,6 @@
 package com.shehanrathnayake.service.custom.impl;
 
+import com.shehanrathnayake.converter.IdConverter;
 import com.shehanrathnayake.entity.Customer;
 import com.shehanrathnayake.exception.AppException;
 import com.shehanrathnayake.repository.CustomerRepository;
@@ -16,51 +17,44 @@ import java.util.Optional;
 @Transactional
 public class CustomerServiceImpl implements CustomerService {
 
-    public final CustomerRepository repository;
-    public final CustomerTransformer transformer;
+    private final CustomerRepository customerRepository;
+    private final CustomerTransformer customerTransformer;
+    private final IdConverter idConverter;
 
-    public CustomerServiceImpl(CustomerRepository repository, CustomerTransformer transformer) {
-        this.repository = repository;
-        this.transformer = transformer;
+    public CustomerServiceImpl(CustomerRepository customerRepository, CustomerTransformer customerTransformer, IdConverter idConverter) {
+        this.customerRepository = customerRepository;
+        this.customerTransformer = customerTransformer;
+        this.idConverter = idConverter;
     }
 
     @Override
     public CustomerTO saveCustomer(CustomerTO customerTO) {
-
-        Optional<Customer> optLastCustomer = repository.findLastCustomer();
-        String newCustomerId;
-        if (optLastCustomer.isEmpty()) newCustomerId = "C000001";
-        else newCustomerId = String.format("C%06d", Integer.parseInt(optLastCustomer.get().getCustomerId().substring(1)) + 1);
-        customerTO.setCustomerId(newCustomerId);
-
-        Customer customer = transformer.fromCustomerTO(customerTO);
-        Customer savedCustomer = repository.save(customer);
-        return transformer.toCustomerTO(savedCustomer);
+        Customer savedCustomer = customerRepository.save(customerTransformer.fromCustomerTO(customerTO));
+        return customerTransformer.toCustomerTO(savedCustomer);
     }
 
     @Override
     public void updateCustomer(CustomerTO customerTO) {
-        repository.findById(customerTO.getCustomerId()).orElseThrow(() -> new AppException(404, "Customer not found"));
-        Customer updatedCustomer = transformer.fromCustomerTO(customerTO);
-        repository.save(updatedCustomer);
+        customerRepository.findById(idConverter.convertCustomerIdToInt(customerTO.getCustomerId())).orElseThrow(() -> new AppException(404, "Customer not found"));
+        customerRepository.save(customerTransformer.fromCustomerTO(customerTO));
     }
 
     @Override
     public void deleteCustomer(String customerId) {
-        Customer customer = repository.findById(customerId).orElseThrow(() -> new AppException(404, "Customer not found"));
-        repository.delete(customer);
+        customerRepository.findById(idConverter.convertCustomerIdToInt(customerId)).orElseThrow(() -> new AppException(404, "Customer not found"));
+        customerRepository.deleteById(idConverter.convertCustomerIdToInt(customerId));
     }
 
     @Override
     public CustomerTO getCustomerDetails(String customerId) {
-        Optional<Customer> optCustomer = repository.findById(customerId);
-        if (optCustomer.isEmpty()) throw new AppException(404, "Customer not found");
-        return transformer.toCustomerTO(optCustomer.get());
+        Customer targetCustomer = customerRepository.findById(idConverter.convertCustomerIdToInt(customerId)).orElseThrow(() -> new AppException(404, "Customer not found"));
+        return customerTransformer.toCustomerTO(targetCustomer);
+
     }
 
     @Override
     public List<CustomerTO> getCustomerList() {
-        List<Customer> customerList = repository.findAll();
-        return transformer.toCustomerTOList(customerList);
+        List<Customer> customerList = customerRepository.findAll();
+        return customerTransformer.toCustomerTOList(customerList);
     }
 }
