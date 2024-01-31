@@ -16,8 +16,6 @@ public class User implements SuperEntity{
     private int id;
     @Column(nullable = false, length = 60)
     private String name;
-    @Column(nullable = false, unique = true, length = 20)
-    private String username;
     @Column(nullable = false, length = 100)
     private String password;
     @Column(nullable = false, length = 10)

@@ -18,7 +18,7 @@ import java.util.List;
 
 @Service
 @Transactional
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
     private final UserTransformer userTransformer;
     private final IdConverter idConverter;
@@ -64,9 +64,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User loggedUser = userRepository.findByUsername(username).orElseThrow(() -> new AppException(404, "User not found"));
+        User loggedUser = userRepository.findById(idConverter.convertUserIdToInt(username)).orElseThrow(() -> new AppException(404, "User not found"));
         return userTransformer.FromUserToUserDetails(loggedUser);
     }
-
-
 }

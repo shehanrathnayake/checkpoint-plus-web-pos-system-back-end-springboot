@@ -16,9 +16,6 @@ public class UserTO implements Serializable {
     @NotBlank(message = "Name cannot be null")
     @Pattern(regexp = "^[A-Za-z. ]+$", message = "Invalid name")
     private String name;
-    @NotBlank(message = "Username cannot be null")
-    @Pattern(regexp = "^[a-z0-9]+$", message = "Invalid username")
-    private String username;
     @NotBlank(message = "Password cannot be null")
     @Pattern(regexp = "^[A-Za-z0-9@#$%^&*]+$", message = "Invalid password format")
     private String password;

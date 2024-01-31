@@ -15,9 +15,11 @@ import java.util.stream.Collectors;
 @Component
 public class UserTransformer {
     private final ModelMapper mapper;
+    private final IdConverter idConverter;
 
-    public UserTransformer(ModelMapper mapper, IdConverter idConverter) {
+    public UserTransformer(ModelMapper mapper, IdConverter idConverter, IdConverter idConverter1) {
         this.mapper = mapper;
+        this.idConverter = idConverter1;
 
         mapper.typeMap(String.class, Integer.class)
                 .setConverter(ctx -> (ctx.getSource() != null) ? idConverter.convertUserIdToInt(ctx.getSource()) : null);
@@ -38,6 +40,6 @@ public class UserTransformer {
 
     public org.springframework.security.core.userdetails.User FromUserToUserDetails(User user) {
         Collection<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRoles()));
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(idConverter.convertIntToUserId(user.getId()), user.getPassword(), authorities);
     }
 }

@@ -30,10 +30,7 @@ public class SecurityConfig {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
                 .antMatchers("/api/v1/login/**", "/api/v1/refresh-token/**").permitAll()
-                .antMatchers(GET, "/api/v1/users/**").hasAuthority("admin")
-                .antMatchers(PATCH, "/api/v1/users/**").hasAuthority("admin")
-                .antMatchers(DELETE, "/api/v1/users/**").hasAuthority("admin")
-                .antMatchers(POST, "/api/v1/users").hasAuthority("admin")
+                .antMatchers("/api/v1/users/**").hasAuthority("manager")
                 .anyRequest().authenticated();
 
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager);

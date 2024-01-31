@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shehanrathnayake.converter.IdConverter;
 import com.shehanrathnayake.entity.User;
 import com.shehanrathnayake.exception.AppException;
 import com.shehanrathnayake.repository.UserRepository;
@@ -26,6 +27,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class RefreshTokenServiceImpl implements RefreshTokenService {
     private final UserRepository userRepository;
+    private final IdConverter idConverter;
     @Override
     public void getAccessToken(HttpServletRequest req, HttpServletResponse res) throws IOException {
         String authorizationHeader = req.getHeader(AUTHORIZATION);
@@ -36,9 +38,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 JWTVerifier verifier = JWT.require(algorithm).build();
                 DecodedJWT decodedJWT = verifier.verify(refresh_token);
                 String username = decodedJWT.getSubject();
-                User user = userRepository.findByUsername(username).orElseThrow(()-> new AppException(404, "User not found"));
+                User user = userRepository.findById(idConverter.convertUserIdToInt(username)).orElseThrow(()-> new AppException(404, "User not found"));
                 String access_token = JWT.create()
-                        .withSubject(user.getUsername())
+                        .withSubject(idConverter.convertIntToUserId(user.getId()))
                         .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
                         .withIssuer(req.getRequestURL().toString())
                         .withClaim("roles", new ArrayList<>(List.of(user.getRoles())))
