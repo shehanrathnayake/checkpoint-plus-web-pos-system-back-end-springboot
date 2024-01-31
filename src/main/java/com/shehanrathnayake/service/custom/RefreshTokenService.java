@@ -7,5 +7,5 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public interface RefreshTokenService extends SuperService {
-    public void getAccessToken(HttpServletRequest req, HttpServletResponse res) throws IOException;
+    void getAccessToken(HttpServletRequest req, HttpServletResponse res) throws IOException;
 }
