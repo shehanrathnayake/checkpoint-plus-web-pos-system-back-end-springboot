@@ -7,6 +7,10 @@ import com.shehanrathnayake.repository.UserRepository;
 import com.shehanrathnayake.service.custom.UserService;
 import com.shehanrathnayake.service.util.UserTransformer;
 import com.shehanrathnayake.to.UserTO;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,20 +18,23 @@ import java.util.List;
 
 @Service
 @Transactional
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
-    private UserTransformer userTransformer;
-    private IdConverter idConverter;
-    private UserRepository userRepository;
+    private final UserTransformer userTransformer;
+    private final IdConverter idConverter;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserTransformer userTransformer, IdConverter idConverter, UserRepository userRepository) {
+    public UserServiceImpl(UserTransformer userTransformer, IdConverter idConverter, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userTransformer = userTransformer;
         this.idConverter = idConverter;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public UserTO saveUser(UserTO userTo) {
+        userTo.setPassword(passwordEncoder.encode(userTo.getPassword()));
         User savedUser = userRepository.save(userTransformer.fromUserTO(userTo));
         return userTransformer.toUserTO(savedUser);
     }
@@ -54,4 +61,12 @@ public class UserServiceImpl implements UserService {
     public List<UserTO> getUserList() {
         return userTransformer.toUserTOList(userRepository.findAll());
     }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User loggedUser = userRepository.findByUsername(username).orElseThrow(() -> new AppException(404, "User not found"));
+        return userTransformer.FromUserToUserDetails(loggedUser);
+    }
+
+
 }

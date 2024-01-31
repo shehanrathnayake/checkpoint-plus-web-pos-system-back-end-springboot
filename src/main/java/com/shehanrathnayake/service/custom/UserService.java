@@ -11,4 +11,5 @@ public interface UserService extends SuperService {
     void deleteUserById(String userId);
     UserTO getUserDetails(String userId);
     List<UserTO> getUserList();
+
 }

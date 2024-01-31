@@ -4,14 +4,17 @@ import com.shehanrathnayake.converter.IdConverter;
 import com.shehanrathnayake.entity.User;
 import com.shehanrathnayake.to.UserTO;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class UserTransformer {
-    private ModelMapper mapper;
+    private final ModelMapper mapper;
 
     public UserTransformer(ModelMapper mapper, IdConverter idConverter) {
         this.mapper = mapper;
@@ -31,5 +34,10 @@ public class UserTransformer {
     }
     public List<UserTO> toUserTOList(List<User> userList) {
         return userList.stream().map(this::toUserTO).collect(Collectors.toList());
+    }
+
+    public org.springframework.security.core.userdetails.User FromUserToUserDetails(User user) {
+        Collection<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRoles()));
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
 }
